@@ -69,7 +69,7 @@ window.addEventListener('load', function (event) {
   display.buffer.canvas.height = game.world.height;
   display.buffer.canvas.width = game.world.width;
 
-  assets_manager.loadTileSetImage('images/Abanana.png', () => {
+  assets_manager.loadTileSetImage('Abanana.png', () => {
     resize();
     engine.start();
   });
