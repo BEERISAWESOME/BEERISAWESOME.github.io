@@ -6,11 +6,16 @@ const Controller = function () {
   this.left = new Controller.ButtonInput();
   this.right = new Controller.ButtonInput();
   this.up = new Controller.ButtonInput();
+  this.down = new Controller.ButtonInput();
+  this.space = new Controller.ButtonInput();
 
   this.keyDownUp = function (type, key_code) {
     var down = type == 'keydown' ? true : false;
 
     switch (key_code) {
+      case 32:
+        this.space.getInput(down);
+        break;
       case 37:
         this.left.getInput(down);
         break;
@@ -19,6 +24,9 @@ const Controller = function () {
         break;
       case 39:
         this.right.getInput(down);
+        break;
+      case 40:
+        this.down.getInput(down);
     }
   };
 };
