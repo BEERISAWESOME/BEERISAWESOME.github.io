@@ -363,7 +363,7 @@ window.addEventListener('load', function () {
             player.createBullet()
         }
 
-        if (controller.shift.active) {
+        if (controller.shift.active && !player.firing) {
             player.changeBullet()
             controller.shift.active = false
         }
@@ -567,10 +567,6 @@ window.addEventListener('load', function () {
     // Add event listeners for controller
     window.addEventListener('keydown', keyDownUp)
     window.addEventListener('keyup', keyDownUp)
-    window.addEventListener('touchstart', (e) => {
-        console.log('touchstart')
-        console.log(e.touches[0].pageX, e.touches[0].pageY)
-    })
 
     engine.start()
 })
