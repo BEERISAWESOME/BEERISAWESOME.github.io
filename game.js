@@ -4,7 +4,7 @@ window.addEventListener('load', function () {
     const context = canvas.getContext('2d')
 
     //Set logical canvas dimensions != intrinsic canvas size
-    canvas.width = 480 // 15 columns
+    canvas.width = 480 + 50 // 15 columns
     canvas.height = 360
 
     //Pixelate Image
@@ -198,43 +198,60 @@ window.addEventListener('load', function () {
         this.source_height = height
     }
 
-    const Bullet = function (x, y, direction) {
-        MovingObject.call(this, 'hydrogenbomb.png', x, y, 100, 100, 15)
+    const Bullet = function (url) {
+        MovingObject.call(this, url, canvas.width, canvas.height, 100, 100, 15)
 
-        this.source_x = 0
-        this.source_y = 0
-        this.source_width = 382
-        this.source_height = 382
-        this.offset_top = 20
-        this.offset_left = 20
-        this.offset_right = 20
-        this.offset_bottom = 20
-
-        switch (direction) {
-            case 'right':
-                this.direction = 'right'
-                this.source_y = 0
-                this.setLeft(player.getRight())
-                break
-            case 'up':
-                this.direction = 'up'
-                this.source_y = this.source_height * 2
-                this.setCenterX(player.getCenterX())
-                this.setBottom(player.getTop())
-                break
-            case 'left':
-                this.direction = 'left'
-                this.source_y = this.source_height
-                this.setRight(player.getLeft())
-                break
-            case 'down':
-                this.direction = 'down'
-                this.source_y = this.source_height * 3
-                this.setTop(player.getBottom())
-                this.setCenterX(player.getCenterX())
-                break
+        this.setBullet = function (direction) {
+            switch (direction) {
+                case 'right':
+                    this.direction = 'right'
+                    this.source_y = 0
+                    this.setCenterY(player.getCenterY() - 20)
+                    this.setLeft(player.getRight())
+                    break
+                case 'up':
+                    this.direction = 'up'
+                    this.source_y = this.source_height * 2
+                    this.setCenterX(player.getCenterX())
+                    this.setBottom(player.getTop())
+                    break
+                case 'left':
+                    this.direction = 'left'
+                    this.source_y = this.source_height
+                    this.setCenterY(player.getCenterY() - 20)
+                    this.setRight(player.getLeft())
+                    break
+                case 'down':
+                    this.direction = 'down'
+                    this.source_y = this.source_height * 3
+                    this.setTop(player.getBottom())
+                    this.setCenterX(player.getCenterX())
+                    break
+            }
         }
     }
+    const hydrogenBomb = new Bullet('hydrogenbomb.png')
+    hydrogenBomb.sprite.src = 'hydrogenbomb.png'
+    hydrogenBomb.source_x = 0
+    hydrogenBomb.source_y = 0
+    hydrogenBomb.source_width = 382
+    hydrogenBomb.source_height = 382
+    hydrogenBomb.offset_top = 20
+    hydrogenBomb.offset_left = 20
+    hydrogenBomb.offset_right = 20
+    hydrogenBomb.offset_bottom = 20
+
+    const paperTowel = new Bullet('papertowel.png')
+    paperTowel.source_x = 0
+    paperTowel.source_y = 0
+    paperTowel.source_width = 138
+    paperTowel.source_height = 138
+    paperTowel.offset_top = 7
+    paperTowel.offset_left = 7
+    paperTowel.offset_right = 7
+    paperTowel.offset_bottom = 7
+    paperTowel.width = 50
+    paperTowel.height = 50
 
     //Define player constructor function
     const Player = function () {
@@ -251,10 +268,16 @@ window.addEventListener('load', function () {
         this.offset_bottom = 10
         this.firing = false
         this.direction = 'down'
+        this.bullet = hydrogenBomb
 
         //Define a function for creating and firing a bullet
         this.createBullet = function () {
-            this.bullet = new Bullet(this.x, this.y, this.direction)
+            this.bullet.setBullet(this.direction)
+        }
+
+        this.changeBullet = function () {
+            if (this.bullet === hydrogenBomb) this.bullet = paperTowel
+            else if (this.bullet === paperTowel) this.bullet = hydrogenBomb
         }
     }
 
@@ -338,6 +361,11 @@ window.addEventListener('load', function () {
             player.firing = true
             controller.space.active = false
             player.createBullet()
+        }
+
+        if (controller.shift.active) {
+            player.changeBullet()
+            controller.shift.active = false
         }
 
         //Update the bullets position
@@ -467,10 +495,24 @@ window.addEventListener('load', function () {
             )
         }
 
+        context.fillStyle = '#FFFFFF'
+        context.fillRect(480, 0, 50, 50)
+
+        context.drawImage(
+            player.bullet.sprite,
+            0,
+            0,
+            player.bullet.source_width,
+            player.bullet.source_height,
+            480,
+            0,
+            50,
+            50
+        )
+
         context.lineWidth = '2'
         //Draw the bullet
         if (player.firing) {
-            console.log(player.bullet)
             context.drawImage(
                 player.bullet.sprite,
                 player.bullet.source_x,
@@ -482,6 +524,7 @@ window.addEventListener('load', function () {
                 player.bullet.width,
                 player.bullet.height
             )
+
             /*
             context.beginPath()
             context.rect(
@@ -524,6 +567,10 @@ window.addEventListener('load', function () {
     // Add event listeners for controller
     window.addEventListener('keydown', keyDownUp)
     window.addEventListener('keyup', keyDownUp)
+    window.addEventListener('touchstart', (e) => {
+        console.log('touchstart')
+        console.log(e.touches[0].pageX, e.touches[0].pageY)
+    })
 
     engine.start()
 })

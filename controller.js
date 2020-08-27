@@ -8,11 +8,15 @@ const Controller = function () {
   this.up = new Controller.ButtonInput();
   this.down = new Controller.ButtonInput();
   this.space = new Controller.ButtonInput();
+    this.shift = new Controller.ButtonInput()
 
   this.keyDownUp = function (type, key_code) {
     var down = type == 'keydown' ? true : false;
 
     switch (key_code) {
+    case 16:
+        this.shift.getInput(down)
+        break
       case 32:
         this.space.getInput(down);
         break;
